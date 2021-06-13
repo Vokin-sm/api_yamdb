@@ -7,32 +7,32 @@ from api.views import (TitlesViewSet, CategoriesViewSet,
 
 router_v1 = DefaultRouter()
 router_v1.register(
-    'v1/titles',
+    'titles',
     TitlesViewSet,
     basename='titles'
 )
 router_v1.register(
-    'v1/categories',
+    'categories',
     CategoriesViewSet,
     basename='categories'
 )
 router_v1.register(
-    'v1/genres',
+    'genres',
     GenresViewSet,
     basename='genres'
 )
 router_v1.register(
-    'v1/titles/(?P<title_id>[^/D+]+)/reviews',
+    'titles/(?P<title_id>[^/D+]+)/reviews',
     ReviewsViewSet,
     basename='reviews'
 )
 router_v1.register(
-    'v1/titles/(?P<title_id>[^/D+]+)/reviews/(?P<review_id>[^/D+]+)/comments',
+    'titles/(?P<title_id>[^/D+]+)/reviews/(?P<review_id>[^/D+]+)/comments',
     CommentsViewSet,
     basename='comments'
 )
 router_v1.register(
-    'v1/users',
+    'users',
     UsersViewSet,
     basename='users'
 )
@@ -40,7 +40,7 @@ router_v1.register(
 
 urlpatterns = [
     path(
-        '',
+        'v1/',
         include(router_v1.urls)
     ),
 ]
