@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.models import Titles, Categories, Genres, Reviews, Comments, User
+from api.permissions import IsAdmin
 from api.serializers import (TitlesSerializer, CategoriesSerializer,
                              GenresSerializer, ReviewsSerializer,
                              CommentsSerializer, UsersSerializer)
@@ -42,6 +43,8 @@ class UsersViewSet(viewsets.ModelViewSet):
 
 class UsersMeAPIView(APIView):
     """Class for displaying and editing your account data."""
+    permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request):
         user = User.objects.get(username=self.request.user.username)
         serializer = UsersSerializer(user)
