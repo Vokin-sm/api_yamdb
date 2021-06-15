@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+import textwrap
 
 
 class UserManager(BaseUserManager):
@@ -97,6 +100,7 @@ class Categories(models.Model):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
+
     def __str__(self):
         return self.name
 
@@ -135,8 +139,65 @@ class Titles(models.Model):
 
 
 class Reviews(models.Model):
-    ...
+    text = models.TextField('Текст')
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name='Автор'
+    )
+    score = models.IntegerField(
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(10)
+        ],
+        verbose_name='Оценка'
+    )
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата публикации'
+    )
+    title = models.ForeignKey(
+        Titles,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name='Произведение'
+    )
+
+    def __str__(self):
+        text = textwrap.wrap(self.text, width=30)[0]
+        author = self.author
+        return f'Автор: {author}, Текст: {text}'
+
+    class Meta:
+        db_table = 'Reviews'
+        ordering = ('-pub_date', )
 
 
 class Comments(models.Model):
-    ...
+    text = models.TextField('Текст')
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Автор'
+    )
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата публикации'
+    )
+    review = models.ForeignKey(
+        Reviews,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Отзыв'
+    )
+
+    def __str__(self):
+        text = textwrap.wrap(self.text, width=30)[0]
+        author = self.author
+        return f'Автор: {author}, Текст: {text}'
+
+    class Meta:
+        db_table = 'Comments'
+        ordering = ('-pub_date', )
