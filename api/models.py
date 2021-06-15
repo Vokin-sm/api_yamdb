@@ -120,8 +120,11 @@ class Titles(models.Model):
     description = models.CharField(
         max_length=150, verbose_name='Описание', blank=True, null=True)
     genre = models.ManyToManyField(Genres, related_name="titles")
-    category = models.ForeignKey(Categories, on_delete=models.SET_NULL,
-                                 null=True, blank=True, related_name="titles")
+    category = models.ForeignKey(Categories,
+                                 on_delete=models.SET_NULL,
+                                 null=True,
+                                 blank=True,
+                                 related_name="titles")
 
     class Meta:
         verbose_name = 'Произведение'
