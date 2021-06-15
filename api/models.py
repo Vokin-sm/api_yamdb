@@ -85,10 +85,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.username
 
 
-class Titles(models.Model):
-    ...
-
-
 class Categories(models.Model):
     name = models.CharField(
         max_length=40,
@@ -113,6 +109,23 @@ class Genres(models.Model):
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
+
+    def __str__(self):
+        return self.name
+
+
+class Titles(models.Model):
+    name = models.CharField(max_length=80, verbose_name='Название')
+    year = models.IntegerField(verbose_name="Год выпуска")
+    description = models.CharField(
+        max_length=150, verbose_name='Описание', blank=True, null=True)
+    genre = models.ManyToManyField(Genres, related_name="titles")
+    category = models.ForeignKey(Categories, on_delete=models.SET_NULL,
+                                 null=True, blank=True, related_name="titles")
+
+    class Meta:
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
 
     def __str__(self):
         return self.name

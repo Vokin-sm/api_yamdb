@@ -2,11 +2,19 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.models import Titles, Categories, Genres, Reviews, Comments, User
-from api.permissions import IsAdmin
-from api.serializers import (TitlesSerializer, CategoriesSerializer,
-                             GenresSerializer, ReviewsSerializer,
-                             CommentsSerializer, UsersSerializer)
+# from api.models import Titles
+# from api.models import Categories
+# from api.models import Genres
+# from api.models import Reviews
+# from api.models import Comments
+from api.models import User
+# from api.permissions import IsAdmin
+# from api.serializers import TitlesSerializer
+# from api.serializers import CategoriesSerializer
+# from api.serializers import GenresSerializer
+# from api.serializers import ReviewsSerializer
+# from api.serializers import CommentsSerializer
+from api.serializers import UsersSerializer
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
