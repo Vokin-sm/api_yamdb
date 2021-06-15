@@ -1,9 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import (
-    AbstractBaseUser,
-    BaseUserManager,
-    PermissionsMixin
-)
+from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager
+from django.contrib.auth.models import PermissionsMixin
 
 
 class UserManager(BaseUserManager):
@@ -92,8 +90,19 @@ class Titles(models.Model):
 
 
 class Categories(models.Model):
-    name = models.CharField(max_length=150, verbose_name='Категория')
-    slug = models.SlugField(unique=True)
+    name = models.CharField(
+        max_length=40,
+        verbose_name='Название категории объекта',
+        unique=True
+    )
+    slug = models.SlugField(unique=True, max_length=30)
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
+    def __str__(self):
+        return self.name
 
 
 class Genres(models.Model):
