@@ -35,13 +35,41 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    id = models.AutoField(primary_key=True, unique=True)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    username = models.CharField(max_length=50, unique=True)
-    bio = models.TextField('О себе', help_text='Напишите кратко о себе')
+    role_choices = [
+        ('user', 'user'),
+        ('moderator', 'moderator'),
+        ('admin', 'admin')
+    ]
+    id = models.AutoField(
+        primary_key=True,
+        unique=True
+    )
+    first_name = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+    )
+    last_name = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+    )
+    username = models.CharField(
+        max_length=50,
+        unique=True
+    )
+    bio = models.TextField(
+        'description',
+        help_text='Напишите кратко о себе',
+        blank=True,
+        null=True,
+    )
     email = models.EmailField(max_length=100, unique=True)
-    role = models.CharField(max_length=50)
+    role = models.CharField(
+        max_length=10,
+        choices=role_choices,
+        default='user',
+    )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -53,6 +81,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+        ordering = ('pk',)
 
     def __str__(self):
         return self.username
