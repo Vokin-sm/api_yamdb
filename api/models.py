@@ -1,9 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import (
-    AbstractBaseUser,
-    BaseUserManager,
-    PermissionsMixin
-)
+from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager
+from django.contrib.auth.models import PermissionsMixin
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 import textwrap
@@ -90,16 +88,54 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.username
 
 
-class Titles(models.Model):
-    ...
-
-
 class Categories(models.Model):
-    ...
+    name = models.CharField(
+        max_length=40,
+        verbose_name='Название категории объекта',
+        unique=True
+    )
+    slug = models.SlugField(unique=True, max_length=30)
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
+
+    def __str__(self):
+        return self.name
 
 
 class Genres(models.Model):
-    ...
+    name = models.CharField(
+        max_length=50, verbose_name="Название жанра", unique=True)
+    slug = models.SlugField(max_length=40, unique=True)
+
+    class Meta:
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
+
+    def __str__(self):
+        return self.name
+
+
+class Titles(models.Model):
+    name = models.CharField(max_length=80, verbose_name='Название')
+    year = models.IntegerField(verbose_name="Год выпуска")
+    description = models.CharField(
+        max_length=150, verbose_name='Описание', blank=True, null=True)
+    genre = models.ManyToManyField(Genres, related_name="titles")
+    category = models.ForeignKey(Categories,
+                                 on_delete=models.SET_NULL,
+                                 null=True,
+                                 blank=True,
+                                 related_name="titles")
+
+    class Meta:
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
+
+    def __str__(self):
+        return self.name
 
 
 class Reviews(models.Model):
