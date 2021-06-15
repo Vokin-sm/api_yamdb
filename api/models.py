@@ -106,7 +106,16 @@ class Categories(models.Model):
 
 
 class Genres(models.Model):
-    ...
+    name = models.CharField(
+        max_length=50, verbose_name="Название жанра", unique=True)
+    slug = models.SlugField(max_length=40, unique=True)
+
+    class Meta:
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
+
+    def __str__(self):
+        return self.name
 
 
 class Reviews(models.Model):
