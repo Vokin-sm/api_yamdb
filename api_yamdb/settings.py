@@ -119,3 +119,10 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
 }
+
+# smtp
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'ypteamwork2@gmail.com'
+EMAIL_HOST_PASSWORD = 'YPTW123456'
+EMAIL_PORT = 587
