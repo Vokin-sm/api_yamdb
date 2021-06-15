@@ -92,7 +92,8 @@ class Titles(models.Model):
 
 
 class Categories(models.Model):
-    ...
+    name = models.CharField(max_length=150, verbose_name='Категория')
+    slug = models.SlugField(unique=True)
 
 
 class Genres(models.Model):
