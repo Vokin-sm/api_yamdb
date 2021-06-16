@@ -2,39 +2,49 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-# from api.models import Titles
-# from api.models import Categories
-# from api.models import Genres
-# from api.models import Reviews
-# from api.models import Comments
+from api.models import Titles
+from api.models import Categories
+from api.models import Genres
+from api.models import Reviews
+from api.models import Comments
 from api.models import User
-# from api.permissions import IsAdmin
-# from api.serializers import TitlesSerializer
-# from api.serializers import CategoriesSerializer
-# from api.serializers import GenresSerializer
-# from api.serializers import ReviewsSerializer
-# from api.serializers import CommentsSerializer
+from api.permissions import IsAdmin
+from api.serializers import TitlesSerializer
+from api.serializers import CategoriesSerializer
+from api.serializers import GenresSerializer
+from api.serializers import ReviewsSerializer
+from api.serializers import CommentsSerializer
 from api.serializers import UsersSerializer
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    ...
+    model = Titles
+    serializer_class = TitlesSerializer
+    queryset = Titles.objects.all()
 
 
 class CategoriesViewSet(viewsets.ModelViewSet):
-    ...
+    model = Categories
+    serializer_class = CategoriesSerializer
+    queryset = Categories.objects.all()
 
 
 class GenresViewSet(viewsets.ModelViewSet):
-    ...
+    model = Genres
+    serializer_class = GenresSerializer
+    queryset = Genres.objects.all()
 
 
 class ReviewsViewSet(viewsets.ModelViewSet):
-    ...
+    model = Reviews
+    serializer_class = ReviewsSerializer
+    queryset = Reviews.objects.all()
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
-    ...
+    model = Comments
+    serializer_class = CommentsSerializer
+    queryset = Comments.objects.all()
 
 
 class UsersViewSet(viewsets.ModelViewSet):
