@@ -7,18 +7,7 @@ from api.models import Reviews
 from api.models import Comments
 from api.models import User
 
-
-class TitlesSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = (
-            'id',
-            'name',
-            'year',
-            'description',
-            'genre',
-            'category'
-        )
-        model = Titles
+from django.db.models import Avg
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
@@ -37,6 +26,35 @@ class GenresSerializer(serializers.ModelSerializer):
             'slug'
         )
         model = Genres
+
+
+class TitlesSerializerGet(serializers.ModelSerializer):
+    genre = GenresSerializer(many=True, read_only=True)
+    category = CategoriesSerializer(read_only=True)
+    rating = serializers.SerializerMethodField()
+
+    class Meta:
+        fields = ('id', 'name', 'year', 'rating',
+                  'description', 'genre', 'category')
+        model = Titles
+
+    def get_rating(self, obj):
+        rating = obj.reviews.all().aggregate(Avg('score'))
+        return rating['score__avg']
+
+
+class TitlesSerializerPost(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(
+        queryset=Genres.objects.all(),
+        slug_field='slug', many=True)
+    category = serializers.SlugRelatedField(
+        queryset=Categories.objects.all(),
+        slug_field='slug'
+    )
+
+    class Meta:
+        fields = ('__all__')
+        model = Titles
 
 
 class ReviewsSerializer(serializers.ModelSerializer):
@@ -93,8 +111,10 @@ class UsersMeSerializer(serializers.ModelSerializer):
         model = User
 
     def update(self, instance, validated_data):
-        instance.first_name = validated_data.get('first_name', instance.first_name)
-        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.first_name = validated_data.get(
+            'first_name', instance.first_name)
+        instance.last_name = validated_data.get(
+            'last_name', instance.last_name)
         instance.username = validated_data.get('username', instance.username)
         instance.bio = validated_data.get('bio', instance.bio)
         instance.email = validated_data.get('email', instance.email)

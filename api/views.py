@@ -21,7 +21,8 @@ from api.models import User
 from api.permissions import IsAdmin
 from api.permissions import IsAdminOrReadOnly
 
-from api.serializers import TitlesSerializer
+from api.serializers import TitlesSerializerGet
+from api.serializers import TitlesSerializerPost
 from api.serializers import CategoriesSerializer
 from api.serializers import GenresSerializer
 from api.serializers import ReviewsSerializer
@@ -29,11 +30,18 @@ from api.serializers import CommentsSerializer
 from api.serializers import UsersSerializer
 from api.serializers import UsersMeSerializer
 
+from api.filters import TitlesFilter
+
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    model = Titles
-    serializer_class = TitlesSerializer
     queryset = Titles.objects.all()
+    permission_classes = [IsAdminOrReadOnly]
+    filterset_class = TitlesFilter
+
+    def get_serializer_class(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return TitlesSerializerGet
+        return TitlesSerializerPost
 
 
 class LCDViewSet(ListModelMixin,
