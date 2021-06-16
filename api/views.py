@@ -16,6 +16,7 @@ from api.serializers import GenresSerializer
 from api.serializers import ReviewsSerializer
 from api.serializers import CommentsSerializer
 from api.serializers import UsersSerializer
+from api.serializers import UsersMeSerializer
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
@@ -66,12 +67,12 @@ class UsersMeAPIView(APIView):
 
     def get(self, request):
         user = User.objects.get(username=self.request.user.username)
-        serializer = UsersSerializer(user)
+        serializer = UsersMeSerializer(user)
         return Response(serializer.data)
 
     def patch(self, request):
         user = User.objects.get(username=self.request.user.username)
-        serializer = UsersSerializer(user, data=request.data)
+        serializer = UsersMeSerializer(user, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
