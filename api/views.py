@@ -54,7 +54,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     serializer_class = UsersSerializer
     permission_classes = [
         permissions.IsAuthenticated,
-        permissions.IsAdminUser
+        IsAdmin,
     ]
     queryset = User.objects.all()
     lookup_field = 'username'
