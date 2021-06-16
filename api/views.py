@@ -43,9 +43,13 @@ class LCDViewSet(ListModelMixin,
 
 
 class CategoriesViewSet(LCDViewSet):
-    model = Categories
-    serializer_class = CategoriesSerializer
     queryset = Categories.objects.all()
+    serializer_class = CategoriesSerializer
+    pagination_class = PageNumberPagination
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', ]
+    lookup_field = 'slug'
 
 
 class GenresViewSet(LCDViewSet):
