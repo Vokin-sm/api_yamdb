@@ -1,7 +1,15 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets
+from rest_framework import permissions
+from rest_framework import status
+from rest_framework import filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.mixins import CreateModelMixin
+from rest_framework.mixins import DestroyModelMixin
+from rest_framework.mixins import ListModelMixin
+
+from rest_framework.viewsets import GenericViewSet
 
 from api.models import Titles
 from api.models import Categories
@@ -9,7 +17,10 @@ from api.models import Genres
 from api.models import Reviews
 from api.models import Comments
 from api.models import User
+
 from api.permissions import IsAdmin
+from api.permissions import IsAdminOrReadOnly
+
 from api.serializers import TitlesSerializer
 from api.serializers import CategoriesSerializer
 from api.serializers import GenresSerializer
@@ -24,16 +35,27 @@ class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
 
 
-class CategoriesViewSet(viewsets.ModelViewSet):
+class LCDViewSet(ListModelMixin,
+                 CreateModelMixin,
+                 DestroyModelMixin,
+                 GenericViewSet):
+    pass
+
+
+class CategoriesViewSet(LCDViewSet):
     model = Categories
     serializer_class = CategoriesSerializer
     queryset = Categories.objects.all()
 
 
-class GenresViewSet(viewsets.ModelViewSet):
-    model = Genres
-    serializer_class = GenresSerializer
+class GenresViewSet(LCDViewSet):
     queryset = Genres.objects.all()
+    serializer_class = GenresSerializer
+    pagination_class = PageNumberPagination
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', ]
+    lookup_field = 'slug'
 
 
 class ReviewsViewSet(viewsets.ModelViewSet):
