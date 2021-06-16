@@ -9,6 +9,7 @@ from api.models import User
 
 
 class TitlesSerializer(serializers.ModelSerializer):
+
     class Meta:
         fields = (
             'id',

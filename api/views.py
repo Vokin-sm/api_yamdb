@@ -41,11 +41,31 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewsSerializer
     queryset = Reviews.objects.all()
 
+    def get_queryset(self):
+        reviews = Reviews.objects.all()
+        title_id = self.kwargs['title_id']
+        queryset = reviews.filter(title_id=title_id)
+        return queryset
+
+    def perform_create(self, serializer):
+        title_id = self.kwargs['title_id']
+        serializer.save(author=self.request.user, post_id=title_id)
+
 
 class CommentsViewSet(viewsets.ModelViewSet):
     model = Comments
     serializer_class = CommentsSerializer
     queryset = Comments.objects.all()
+
+    def get_queryset(self):
+        comments = Comments.objects.all()
+        review_id = self.kwargs['review_id']
+        queryset = comments.filter(review_id=review_id)
+        return queryset
+
+    def perform_create(self, serializer):
+        review_id = self.kwargs['review_id']
+        serializer.save(author=self.request.user, post_id=review_id)
 
 
 class UsersViewSet(viewsets.ModelViewSet):
