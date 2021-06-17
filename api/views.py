@@ -1,3 +1,5 @@
+import random
+
 from django.core.mail import send_mail
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -112,7 +114,7 @@ class UsersMeAPIView(APIView):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def send_confirmation_code_create_user(request):
-    confirmation_code = 123456
+    confirmation_code = random.randint(111111, 999999)
     username = request.data['email'].split('@')[0]
     User.objects.create_user(
         request.data['email'],
