@@ -1,7 +1,10 @@
+from django.core.mail import send_mail
 from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework import filters
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
@@ -28,6 +31,7 @@ from api.serializers import ReviewsSerializer
 from api.serializers import CommentsSerializer
 from api.serializers import UsersSerializer
 from api.serializers import UsersMeSerializer
+from api_yamdb import settings
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
@@ -103,3 +107,22 @@ class UsersMeAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def send_confirmation_code_create_user(request):
+    confirmation_code = 123456
+    username = request.data['email'].split('@')[0]
+    User.objects.create_user(
+        request.data['email'],
+        username=username,
+        password=''
+    )
+    send_mail(
+        'Подтверждение почты',
+        f'{confirmation_code}',
+        settings.EMAIL_HOST_USER,
+        [request.data['email']]
+    )
+    return Response(request.data, status=status.HTTP_200_OK)

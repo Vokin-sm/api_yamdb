@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import (TokenObtainPairView,
 from api.views import (TitlesViewSet, CategoriesViewSet,
                        GenresViewSet, ReviewsViewSet,
                        CommentsViewSet, UsersViewSet,
-                       UsersMeAPIView)
+                       UsersMeAPIView, send_confirmation_code_create_user)
 
 router_v1 = DefaultRouter()
 router_v1.register(
@@ -50,18 +50,14 @@ urlpatterns = [
         'v1/',
         include(router_v1.urls)
     ),
-    # path(
-    #     'v1/auth/',
-    #     include('djoser.urls')
-    # ),
+    path(
+        'v1/auth/email/',
+        send_confirmation_code_create_user,
+        name='send_confirmation_code_create_user'
+    ),
     path(
         'v1/auth/token/',
         TokenObtainPairView.as_view(),
         name='token_obtain_pair'
-    ),
-    path(
-        'v1/auth/token/refresh/',
-        TokenRefreshView.as_view(),
-        name='token_refresh'
     ),
 ]
