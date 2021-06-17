@@ -8,7 +8,12 @@ import textwrap
 
 
 class UserManager(BaseUserManager):
-    def _create_user(self, email, username, password, confirmation_code, **extra_fields):
+    def _create_user(self,
+                     email,
+                     username,
+                     password,
+                     confirmation_code=None,
+                     **extra_fields):
         if not email:
             raise ValueError("Вы не ввели email")
         if not username:
