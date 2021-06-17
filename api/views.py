@@ -119,7 +119,8 @@ def send_confirmation_code_create_user(request):
     User.objects.create_user(
         request.data['email'],
         username=username,
-        password=''
+        password='',
+        confirmation_code=confirmation_code
     )
     send_mail(
         'Подтверждение почты',

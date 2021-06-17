@@ -1,4 +1,6 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from api.models import Titles
 from api.models import Categories
@@ -102,3 +104,12 @@ class UsersMeSerializer(serializers.ModelSerializer):
             instance.role = validated_data.get('role', instance.role)
         instance.save()
         return instance
+
+
+# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+#     username_field = get_user_model().email
+#
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self.fields['confirmation_code'] = serializers.CharField(required=True)
+#         self.fields.pop('password')

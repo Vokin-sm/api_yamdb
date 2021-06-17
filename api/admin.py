@@ -13,6 +13,7 @@ class UserAdmin(admin.ModelAdmin):
         'bio',
         'email',
         'role',
+        'confirmation_code',
         'is_active',
         'is_staff'
     )

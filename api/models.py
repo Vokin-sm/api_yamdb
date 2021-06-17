@@ -8,7 +8,7 @@ import textwrap
 
 
 class UserManager(BaseUserManager):
-    def _create_user(self, email, username, password, **extra_fields):
+    def _create_user(self, email, username, password, confirmation_code, **extra_fields):
         if not email:
             raise ValueError("Вы не ввели email")
         if not username:
@@ -16,17 +16,23 @@ class UserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             username=username,
+            confirmation_code=confirmation_code,
             **extra_fields,
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, username, password):
+    def create_user(self,
+                    email,
+                    username,
+                    password,
+                    confirmation_code):
         return self._create_user(
             email,
             username,
             password,
+            confirmation_code,
             is_active=False
         )
 
@@ -75,6 +81,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=10,
         choices=role_choices,
         default='user',
+    )
+    confirmation_code = models.IntegerField(
+        blank=True,
+        null=True,
     )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
