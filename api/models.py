@@ -2,28 +2,46 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator
+from django.core.validators import MinValueValidator
 
 import textwrap
 
 
 class UserManager(BaseUserManager):
-    def _create_user(self, email, username, password, **extra_fields):
+    """Custom user manager."""
+    def _create_user(self,
+                     email,
+                     username,
+                     password,
+                     confirmation_code=None,
+                     **extra_fields):
         if not email:
-            raise ValueError("Вы не ввели email")
+            raise ValueError('Вы не ввели email')
         if not username:
-            raise ValueError("Вы не ввели username")
+            raise ValueError('Вы не ввели username')
         user = self.model(
             email=self.normalize_email(email),
             username=username,
+            confirmation_code=confirmation_code,
             **extra_fields,
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, username, password):
-        return self._create_user(email, username, password)
+    def create_user(self,
+                    email,
+                    username,
+                    password,
+                    confirmation_code):
+        return self._create_user(
+            email,
+            username,
+            password,
+            confirmation_code,
+            is_active=False
+        )
 
     def create_superuser(self, email, username, password):
         return self._create_user(
@@ -36,6 +54,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    """Custom user model."""
     role_choices = [
         ('user', 'user'),
         ('moderator', 'moderator'),
@@ -70,6 +89,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=10,
         choices=role_choices,
         default='user',
+    )
+    confirmation_code = models.IntegerField(
+        blank=True,
+        null=True,
     )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -107,7 +130,7 @@ class Categories(models.Model):
 
 class Genres(models.Model):
     name = models.CharField(
-        max_length=50, verbose_name="Название жанра", unique=True)
+        max_length=50, verbose_name='Название жанра', unique=True)
     slug = models.SlugField(max_length=40, unique=True)
 
     class Meta:
@@ -121,15 +144,15 @@ class Genres(models.Model):
 
 class Titles(models.Model):
     name = models.CharField(max_length=80, verbose_name='Название')
-    year = models.IntegerField(verbose_name="Год выпуска")
+    year = models.IntegerField(verbose_name='Год выпуска')
     description = models.CharField(
         max_length=150, verbose_name='Описание', blank=True, null=True)
-    genre = models.ManyToManyField(Genres, related_name="titles")
+    genre = models.ManyToManyField(Genres, related_name='titles')
     category = models.ForeignKey(Categories,
                                  on_delete=models.SET_NULL,
                                  null=True,
                                  blank=True,
-                                 related_name="titles")
+                                 related_name='titles')
 
     class Meta:
         verbose_name = 'Произведение'
