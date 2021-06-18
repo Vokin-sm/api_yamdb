@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import ValidationError
 
 from api.models import Titles
 from api.models import Categories
@@ -58,19 +59,39 @@ class TitlesSerializerPost(serializers.ModelSerializer):
 
 
 class ReviewsSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        queryset=User.objects.all(),
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+    title = serializers.SlugRelatedField(
+        queryset=Titles.objects.all(),
+        slug_field='name',
+        required=False
+    )
+
+    def validate(self, data):
+        if self.context['request'].method == 'PATCH':
+            return data
+        title_id = self.context['view'].kwargs['title_id']
+        author = self.context['request'].user
+        if Reviews.objects.filter(author=author, title_id=title_id).exists():
+            raise ValidationError
+        return data
+
     class Meta:
-        fields = (
-            'text',
-            'author',
-            'score',
-            'pub_date'
-        )
+        fields = ('__all__')
         model = Reviews
 
-
 class CommentsSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        queryset=User.objects.all(),
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
     class Meta:
         fields = (
+            'id',
             'text',
             'author',
             'pub_date'
