@@ -9,6 +9,8 @@ from rest_framework.mixins import CreateModelMixin
 from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 
+from django.shortcuts import get_object_or_404
+
 from rest_framework.viewsets import GenericViewSet
 
 from api.models import Titles
@@ -20,6 +22,7 @@ from api.models import User
 
 from api.permissions import IsAdmin
 from api.permissions import IsAdminOrReadOnly
+from api.permissions import IsOwnerOrAdminOrModeratorOrReadOnly
 
 from api.serializers import TitlesSerializerGet
 from api.serializers import TitlesSerializerPost
@@ -74,7 +77,10 @@ class GenresViewSet(LCDViewSet):
 class ReviewsViewSet(viewsets.ModelViewSet):
     model = Reviews
     serializer_class = ReviewsSerializer
-    queryset = Reviews.objects.all()
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrAdminOrModeratorOrReadOnly
+    ]
 
     def get_queryset(self):
         reviews = Reviews.objects.all()
@@ -83,14 +89,18 @@ class ReviewsViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        title_id = self.kwargs['title_id']
-        serializer.save(author=self.request.user, post_id=title_id)
+        title = get_object_or_404(Titles, id=self.kwargs['title_id'])
+        serializer.save(author=self.request.user, title=title)
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
     model = Comments
     serializer_class = CommentsSerializer
     queryset = Comments.objects.all()
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrAdminOrModeratorOrReadOnly
+    ]
 
     def get_queryset(self):
         comments = Comments.objects.all()
@@ -100,7 +110,8 @@ class CommentsViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         review_id = self.kwargs['review_id']
-        serializer.save(author=self.request.user, post_id=review_id)
+        review = get_object_or_404(Reviews, id=review_id)
+        serializer.save(author=self.request.user, review=review)
 
 
 class UsersViewSet(viewsets.ModelViewSet):
