@@ -85,12 +85,14 @@ class ReviewsSerializer(serializers.ModelSerializer):
         fields = ('__all__')
         model = Reviews
 
+
 class CommentsSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         queryset=User.objects.all(),
         slug_field='username',
         default=serializers.CurrentUserDefault()
     )
+
     class Meta:
         fields = (
             'id',
