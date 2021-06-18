@@ -15,6 +15,8 @@ from rest_framework.mixins import CreateModelMixin
 from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 
+from django.shortcuts import get_object_or_404
+
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -27,9 +29,12 @@ from api.models import User
 
 from api.permissions import IsAdmin
 from api.permissions import IsAdminOrReadOnly
+from api.permissions import IsOwnerOrAdminOrModeratorOrReadOnly
 
-from api.serializers import TitlesSerializer
+
 from api.serializers import LoginSerializer
+from api.serializers import TitlesSerializerGet
+from api.serializers import TitlesSerializerPost
 from api.serializers import CategoriesSerializer
 from api.serializers import GenresSerializer
 from api.serializers import ReviewsSerializer
@@ -38,11 +43,18 @@ from api.serializers import UsersSerializer
 from api.serializers import UsersMeSerializer
 from api_yamdb import settings
 
+from api.filters import TitlesFilter
+
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    model = Titles
-    serializer_class = TitlesSerializer
     queryset = Titles.objects.all()
+    permission_classes = [IsAdminOrReadOnly]
+    filterset_class = TitlesFilter
+
+    def get_serializer_class(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return TitlesSerializerGet
+        return TitlesSerializerPost
 
 
 class LCDViewSet(ListModelMixin,
@@ -75,13 +87,41 @@ class GenresViewSet(LCDViewSet):
 class ReviewsViewSet(viewsets.ModelViewSet):
     model = Reviews
     serializer_class = ReviewsSerializer
-    queryset = Reviews.objects.all()
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrAdminOrModeratorOrReadOnly
+    ]
+
+    def get_queryset(self):
+        reviews = Reviews.objects.all()
+        title_id = self.kwargs['title_id']
+        queryset = reviews.filter(title_id=title_id)
+        return queryset
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Titles, id=self.kwargs['title_id'])
+        serializer.save(author=self.request.user, title=title)
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
     model = Comments
     serializer_class = CommentsSerializer
     queryset = Comments.objects.all()
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrAdminOrModeratorOrReadOnly
+    ]
+
+    def get_queryset(self):
+        comments = Comments.objects.all()
+        review_id = self.kwargs['review_id']
+        queryset = comments.filter(review_id=review_id)
+        return queryset
+
+    def perform_create(self, serializer):
+        review_id = self.kwargs['review_id']
+        review = get_object_or_404(Reviews, id=review_id)
+        serializer.save(author=self.request.user, review=review)
 
 
 class UsersViewSet(viewsets.ModelViewSet):

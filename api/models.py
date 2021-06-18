@@ -157,6 +157,7 @@ class Titles(models.Model):
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
+        ordering = ('-name', )
 
     def __str__(self):
         return self.name
@@ -172,7 +173,7 @@ class Reviews(models.Model):
     )
     score = models.IntegerField(
         validators=[
-            MinValueValidator(0),
+            MinValueValidator(1),
             MaxValueValidator(10)
         ],
         verbose_name='Оценка'
