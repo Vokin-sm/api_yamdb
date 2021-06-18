@@ -8,6 +8,7 @@ import textwrap
 
 
 class UserManager(BaseUserManager):
+    """Custom user manager."""
     def _create_user(self,
                      email,
                      username,
@@ -52,6 +53,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    """Custom user model."""
     role_choices = [
         ('user', 'user'),
         ('moderator', 'moderator'),

@@ -107,6 +107,7 @@ class UsersMeSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(TokenObtainPairSerializer):
+    """Serializer for issuing a jwt token."""
     def validate(self, attrs):
         # implement your logic here
         data = super().validate(attrs)

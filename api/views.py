@@ -116,6 +116,7 @@ class UsersMeAPIView(APIView):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def send_confirmation_code_create_user(request):
+    """Creates a user and sends him a confirmation code by email."""
     confirmation_code = random.randint(111111, 999999)
     username = request.data['email'].split('@')[0]
     User.objects.create_user(
@@ -134,4 +135,5 @@ def send_confirmation_code_create_user(request):
 
 
 class LoginView(TokenObtainPairView):
+    """Issues a jwt token to the user."""
     serializer_class = LoginSerializer
