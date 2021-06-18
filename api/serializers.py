@@ -106,10 +106,8 @@ class UsersMeSerializer(serializers.ModelSerializer):
         return instance
 
 
-# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-#     username_field = get_user_model().email
-#
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         self.fields['confirmation_code'] = serializers.CharField(required=True)
-#         self.fields.pop('password')
+class LoginSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        # implement your logic here
+        data = super().validate(attrs)
+        return data

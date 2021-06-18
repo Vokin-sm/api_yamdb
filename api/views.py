@@ -15,6 +15,7 @@ from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 
 from rest_framework.viewsets import GenericViewSet
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from api.models import Titles
 from api.models import Categories
@@ -27,6 +28,7 @@ from api.permissions import IsAdmin
 from api.permissions import IsAdminOrReadOnly
 
 from api.serializers import TitlesSerializer
+from api.serializers import LoginSerializer
 from api.serializers import CategoriesSerializer
 from api.serializers import GenresSerializer
 from api.serializers import ReviewsSerializer
@@ -129,3 +131,7 @@ def send_confirmation_code_create_user(request):
         [request.data['email']]
     )
     return Response(request.data, status=status.HTTP_200_OK)
+
+
+class LoginView(TokenObtainPairView):
+    serializer_class = LoginSerializer

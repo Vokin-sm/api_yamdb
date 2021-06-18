@@ -2,7 +2,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-# from api.Token import MyTokenObtainPairView
+# from api.Token import LoginView
 from api.views import (TitlesViewSet, CategoriesViewSet,
                        GenresViewSet, ReviewsViewSet,
                        CommentsViewSet, UsersViewSet,
