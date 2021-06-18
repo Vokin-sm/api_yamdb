@@ -1,8 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenObtainPairView
 
-# from api.Token import LoginView
+from api.views import LoginView
 from api.views import (TitlesViewSet, CategoriesViewSet,
                        GenresViewSet, ReviewsViewSet,
                        CommentsViewSet, UsersViewSet,
@@ -57,7 +56,7 @@ urlpatterns = [
     ),
     path(
         'v1/auth/token/',
-        TokenObtainPairView.as_view(),
-        name='token_obtain_pair'
+        LoginView.as_view(),
+        name='login_view'
     ),
 ]
