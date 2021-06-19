@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import User, Reviews, Comments, Titles, Genres, Categories
+from .models import Categories, Comments, Genres, Reviews, Titles, User
 
 
 @admin.register(User)
@@ -13,6 +13,7 @@ class UserAdmin(admin.ModelAdmin):
         'bio',
         'email',
         'role',
+        'confirmation_code',
         'is_active',
         'is_staff'
     )

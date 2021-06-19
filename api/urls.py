@@ -1,12 +1,11 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import (TokenObtainPairView,
-                                            TokenRefreshView)
 
+from api.views import LoginView
 from api.views import (TitlesViewSet, CategoriesViewSet,
                        GenresViewSet, ReviewsViewSet,
                        CommentsViewSet, UsersViewSet,
-                       UsersMeAPIView)
+                       UsersMeAPIView, send_confirmation_code_create_user)
 
 router_v1 = DefaultRouter()
 router_v1.register(
@@ -50,18 +49,14 @@ urlpatterns = [
         'v1/',
         include(router_v1.urls)
     ),
-    # path(
-    #     'v1/auth/',
-    #     include('djoser.urls')
-    # ),
     path(
-        'v1/auth/token/',
-        TokenObtainPairView.as_view(),
-        name='token_obtain_pair'
+        'v1/auth/email/',
+        send_confirmation_code_create_user,
+        name='send_confirmation_code_create_user'
     ),
     path(
-        'v1/auth/token/refresh/',
-        TokenRefreshView.as_view(),
-        name='token_refresh'
+        'v1/auth/token/',
+        LoginView.as_view(),
+        name='login_view'
     ),
 ]
