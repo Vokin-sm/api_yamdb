@@ -30,7 +30,7 @@ from api.permissions import IsAdmin
 from api.permissions import IsAdminOrReadOnly
 from api.permissions import IsOwnerOrAdminOrModeratorOrReadOnly
 
-
+from api.serializers import EmailSerializer
 from api.serializers import LoginSerializer
 from api.serializers import TitlesSerializerGet
 from api.serializers import TitlesSerializerPost
@@ -153,6 +153,8 @@ class UsersViewSet(viewsets.ModelViewSet):
 def send_confirmation_code_create_user(request):
     """Creates a user and sends him a confirmation code by email."""
     confirmation_code = random.randint(111111, 999999)
+    serializer = EmailSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
     username = request.data['email'].split('@')[0]
     User.objects.create_user(
         request.data['email'],

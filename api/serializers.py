@@ -120,7 +120,6 @@ class UsersSerializer(serializers.ModelSerializer):
 
 class UsersMeSerializer(serializers.ModelSerializer):
     """Serialization of users.me"""
-
     username = serializers.CharField(required=False)
     email = serializers.EmailField(required=False)
 
@@ -188,3 +187,11 @@ class LoginSerializer(TokenObtainPairSerializer):
         data['refresh'] = str(refresh)
         data['access'] = str(refresh.access_token)
         return data
+
+
+class EmailSerializer(serializers.ModelSerializer):
+    """Serialization of users.email"""
+
+    class Meta:
+        fields = ('email',)
+        model = User
