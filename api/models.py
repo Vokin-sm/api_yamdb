@@ -75,7 +75,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(
         max_length=50,
         blank=True,
-        # null=True,
+        null=True,
     )
     username = models.CharField(
         max_length=50,
@@ -85,7 +85,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         'description',
         help_text='Напишите кратко о себе',
         blank=True,
-        # null=True,
+        null=True,
     )
     email = models.EmailField(max_length=100, unique=True)
     role = models.CharField(
@@ -187,7 +187,6 @@ class Titles(models.Model):
     description = models.TextField(
         verbose_name='Описание',
         blank=True,
-        # null=True
     )
     genre = models.ManyToManyField(
         Genres,
