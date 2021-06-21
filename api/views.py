@@ -47,6 +47,8 @@ from api.filters import TitlesFilter
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
+    """Class Titles"""
+
     queryset = Titles.objects.all()
     permission_classes = [IsAdminOrReadOnly]
     filterset_class = TitlesFilter
@@ -61,10 +63,14 @@ class LCDViewSet(ListModelMixin,
                  CreateModelMixin,
                  DestroyModelMixin,
                  GenericViewSet):
+    """This class can 'List', 'Create', 'Destroy' objects"""
+
     pass
 
 
 class CategoriesViewSet(LCDViewSet):
+    """Class Categories"""
+
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
     pagination_class = PageNumberPagination
@@ -75,6 +81,8 @@ class CategoriesViewSet(LCDViewSet):
 
 
 class GenresViewSet(LCDViewSet):
+    """Class Genres"""
+
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
     pagination_class = PageNumberPagination

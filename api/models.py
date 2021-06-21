@@ -7,9 +7,12 @@ from django.core.validators import MinValueValidator
 
 import textwrap
 
+from datetime import datetime
+
 
 class UserManager(BaseUserManager):
     """Custom user manager."""
+
     def _create_user(self,
                      email,
                      username,
@@ -102,6 +105,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
+    @property
+    def is_admin(self):
+        return self.is_staff or self.role == 'admin'
+
+    @property
+    def is_moderator(self):
+        return self.role == 'moderator'
+
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
@@ -112,12 +123,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Categories(models.Model):
+    """Categories model. Include 'name' and 'slug'"""
+
     name = models.CharField(
         max_length=40,
         verbose_name='Название категории объекта',
         unique=True
     )
-    slug = models.SlugField(unique=True, max_length=30)
+    slug = models.SlugField(
+        unique=True,
+        max_length=30
+    )
 
     class Meta:
         verbose_name = 'Категория'
@@ -129,9 +145,17 @@ class Categories(models.Model):
 
 
 class Genres(models.Model):
+    """Genres. Include 'name' and 'slug'"""
+
     name = models.CharField(
-        max_length=50, verbose_name='Название жанра', unique=True)
-    slug = models.SlugField(max_length=40, unique=True)
+        max_length=50,
+        verbose_name='Название жанра',
+        unique=True
+    )
+    slug = models.SlugField(
+        max_length=40,
+        unique=True
+    )
 
     class Meta:
         verbose_name = 'Жанр'
@@ -143,16 +167,39 @@ class Genres(models.Model):
 
 
 class Titles(models.Model):
-    name = models.CharField(max_length=80, verbose_name='Название')
-    year = models.IntegerField(verbose_name='Год выпуска')
-    description = models.CharField(
-        max_length=150, verbose_name='Описание', blank=True, null=True)
-    genre = models.ManyToManyField(Genres, related_name='titles')
-    category = models.ForeignKey(Categories,
-                                 on_delete=models.SET_NULL,
-                                 null=True,
-                                 blank=True,
-                                 related_name='titles')
+    """
+    Titles model. Include 'name', 'year',
+    'description', 'genre' and 'category'
+    """
+
+    name = models.CharField(
+        max_length=80,
+        verbose_name='Название'
+    )
+    year = models.SmallIntegerField(
+        verbose_name='Год выпуска',
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(datetime.now().year)
+        ],
+        db_index=True
+    )
+    description = models.TextField(
+        verbose_name='Описание',
+        blank=True,
+        null=True
+    )
+    genre = models.ManyToManyField(
+        Genres,
+        related_name='titles'
+    )
+    category = models.ForeignKey(
+        Categories,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='titles'
+    )
 
     class Meta:
         verbose_name = 'Произведение'
