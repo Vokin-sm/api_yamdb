@@ -55,11 +55,20 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     """Custom user model."""
-    role_choices = [
-        ('user', 'user'),
-        ('moderator', 'moderator'),
-        ('admin', 'admin')
-    ]
+
+    @property
+    def is_admin(self):
+        return self.is_staff or self.role == 'admin'
+
+    @property
+    def is_moderator(self):
+        return self.role == 'moderator'
+
+    class RoleChoices(models.TextChoices):
+        USER = 'user',
+        MODERATOR = 'moderator',
+        ADMIN = 'admin',
+
     id = models.AutoField(
         primary_key=True,
         unique=True
@@ -67,12 +76,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(
         max_length=50,
         blank=True,
-        null=True,
     )
     last_name = models.CharField(
         max_length=50,
         blank=True,
-        null=True,
     )
     username = models.CharField(
         max_length=50,
@@ -82,13 +89,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         'description',
         help_text='Напишите кратко о себе',
         blank=True,
-        null=True,
     )
     email = models.EmailField(max_length=100, unique=True)
     role = models.CharField(
-        max_length=10,
-        choices=role_choices,
-        default='user',
+        max_length=50,
+        choices=RoleChoices.choices,
+        default=RoleChoices.USER,
     )
     confirmation_code = models.IntegerField(
         blank=True,
