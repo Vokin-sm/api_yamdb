@@ -5,11 +5,10 @@ from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework import filters
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.mixins import DestroyModelMixin
@@ -31,7 +30,7 @@ from api.permissions import IsAdmin
 from api.permissions import IsAdminOrReadOnly
 from api.permissions import IsOwnerOrAdminOrModeratorOrReadOnly
 
-
+from api.serializers import EmailSerializer
 from api.serializers import LoginSerializer
 from api.serializers import TitlesSerializerGet
 from api.serializers import TitlesSerializerPost
@@ -135,23 +134,18 @@ class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     lookup_field = 'username'
 
-
-class UsersMeAPIView(APIView):
-    """Class for displaying and editing your account data."""
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request):
+    @action(detail=False,
+            methods=['get', 'patch'],
+            permission_classes=[permissions.IsAuthenticated])
+    def me(self, request):
         user = User.objects.get(username=self.request.user.username)
-        serializer = UsersMeSerializer(user)
-        return Response(serializer.data)
-
-    def patch(self, request):
-        user = User.objects.get(username=self.request.user.username)
+        if request.method == 'GET':
+            serializer = UsersMeSerializer(user)
+            return Response(serializer.data)
         serializer = UsersMeSerializer(user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -159,6 +153,8 @@ class UsersMeAPIView(APIView):
 def send_confirmation_code_create_user(request):
     """Creates a user and sends him a confirmation code by email."""
     confirmation_code = random.randint(111111, 999999)
+    serializer = EmailSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
     username = request.data['email'].split('@')[0]
     User.objects.create_user(
         request.data['email'],
