@@ -1,44 +1,48 @@
+from django.db.models import Avg
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.serializers import PasswordField
+from rest_framework_simplejwt.serializers import (PasswordField,
+                                                  TokenObtainPairSerializer)
 
-from api.models import Categories
-from api.models import Comments
-from api.models import Genres
-from api.models import Reviews
-from api.models import Titles
-from api.models import User
-
-from django.db.models import Avg
+from api.models import Categories, Comments, Genres, Reviews, Titles, User
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
+    """Is used to serialize categories."""
+
     class Meta:
-        fields = (
-            'name',
-            'slug'
-        )
         model = Categories
+        exclude = ['id']
 
 
 class GenresSerializer(serializers.ModelSerializer):
+    """Is used to serialize genres."""
+
     class Meta:
-        fields = (
-            'name',
-            'slug'
-        )
         model = Genres
+        exclude = ['id']
 
 
 class TitlesSerializerGet(serializers.ModelSerializer):
-    genre = GenresSerializer(many=True, read_only=True)
+    """Is used to serialize GET requests for titles"""
+
+    genre = GenresSerializer(
+        many=True,
+        read_only=True
+    )
     category = CategoriesSerializer(read_only=True)
     rating = serializers.SerializerMethodField()
 
     class Meta:
-        fields = ('id', 'name', 'year', 'rating',
-                  'description', 'genre', 'category')
+        fields = [
+            'id',
+            'name',
+            'year',
+            'rating',
+            'description',
+            'genre',
+            'category'
+        ]
         model = Titles
 
     def get_rating(self, obj):
@@ -47,29 +51,30 @@ class TitlesSerializerGet(serializers.ModelSerializer):
 
 
 class TitlesSerializerPost(serializers.ModelSerializer):
+    """Is used to serialize POST requests for titles."""
+
     genre = serializers.SlugRelatedField(
         queryset=Genres.objects.all(),
-        slug_field='slug', many=True)
+        slug_field='slug',
+        many=True
+    )
     category = serializers.SlugRelatedField(
         queryset=Categories.objects.all(),
         slug_field='slug'
     )
 
     class Meta:
-        fields = ('__all__')
+        fields = '__all__'
         model = Titles
 
 
 class ReviewsSerializer(serializers.ModelSerializer):
+    """Is used to serialize reviews."""
+
     author = serializers.SlugRelatedField(
         queryset=User.objects.all(),
         slug_field='username',
         default=serializers.CurrentUserDefault()
-    )
-    title = serializers.SlugRelatedField(
-        queryset=Titles.objects.all(),
-        slug_field='name',
-        required=False
     )
 
     def validate(self, data):
@@ -82,11 +87,18 @@ class ReviewsSerializer(serializers.ModelSerializer):
         return data
 
     class Meta:
-        fields = ('__all__')
+        fields = (
+            'id',
+            'text',
+            'author',
+            'score',
+            'pub_date'
+        )
         model = Reviews
 
 
 class CommentsSerializer(serializers.ModelSerializer):
+    """Is used to serialize comments."""
     author = serializers.SlugRelatedField(
         queryset=User.objects.all(),
         slug_field='username',
@@ -104,7 +116,7 @@ class CommentsSerializer(serializers.ModelSerializer):
 
 
 class UsersSerializer(serializers.ModelSerializer):
-    """Serialization of users."""
+    """Is used to serialize users."""
 
     class Meta:
         fields = (
@@ -119,8 +131,7 @@ class UsersSerializer(serializers.ModelSerializer):
 
 
 class UsersMeSerializer(serializers.ModelSerializer):
-    """Serialization of users.me"""
-
+    """Is used to serialize model of current user."""
     username = serializers.CharField(required=False)
     email = serializers.EmailField(required=False)
 
@@ -167,7 +178,7 @@ class UsersMeSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(TokenObtainPairSerializer):
-    """Serializer for issuing a jwt token."""
+    """Is used to serialize confirmation code for JWT Token."""
     email = serializers.EmailField()
     confirmation_code = serializers.IntegerField()
 
@@ -188,3 +199,11 @@ class LoginSerializer(TokenObtainPairSerializer):
         data['refresh'] = str(refresh)
         data['access'] = str(refresh.access_token)
         return data
+
+
+class EmailSerializer(serializers.ModelSerializer):
+    """Is used to serialize users email."""
+
+    class Meta:
+        fields = ('email',)
+        model = User

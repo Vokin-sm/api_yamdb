@@ -1,15 +1,15 @@
-from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
-from django.contrib.auth.models import BaseUserManager
-from django.contrib.auth.models import PermissionsMixin
-from django.core.validators import MaxValueValidator
-from django.core.validators import MinValueValidator
-
 import textwrap
+from datetime import datetime
+
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
+                                        PermissionsMixin)
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
 
 class UserManager(BaseUserManager):
     """Custom user manager."""
+
     def _create_user(self,
                      email,
                      username,
@@ -55,11 +55,20 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     """Custom user model."""
-    role_choices = [
-        ('user', 'user'),
-        ('moderator', 'moderator'),
-        ('admin', 'admin')
-    ]
+
+    @property
+    def is_admin(self):
+        return self.is_staff or self.role == 'admin'
+
+    @property
+    def is_moderator(self):
+        return self.role == 'moderator'
+
+    class RoleChoices(models.TextChoices):
+        USER = 'user',
+        MODERATOR = 'moderator',
+        ADMIN = 'admin',
+
     id = models.AutoField(
         primary_key=True,
         unique=True
@@ -67,12 +76,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(
         max_length=50,
         blank=True,
-        null=True,
     )
     last_name = models.CharField(
         max_length=50,
         blank=True,
-        null=True,
     )
     username = models.CharField(
         max_length=50,
@@ -82,13 +89,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         'description',
         help_text='Напишите кратко о себе',
         blank=True,
-        null=True,
     )
     email = models.EmailField(max_length=100, unique=True)
     role = models.CharField(
-        max_length=10,
-        choices=role_choices,
-        default='user',
+        max_length=50,
+        choices=RoleChoices.choices,
+        default=RoleChoices.USER,
     )
     confirmation_code = models.IntegerField(
         blank=True,
@@ -102,6 +108,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
+    @property
+    def is_admin(self):
+        return self.is_staff or self.role == 'admin'
+
+    @property
+    def is_moderator(self):
+        return self.role == 'moderator'
+
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
@@ -112,12 +126,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Categories(models.Model):
+    """Categories model. Include 'name' and 'slug'"""
+
     name = models.CharField(
         max_length=40,
         verbose_name='Название категории объекта',
         unique=True
     )
-    slug = models.SlugField(unique=True, max_length=30)
+    slug = models.SlugField(
+        unique=True,
+        max_length=30
+    )
 
     class Meta:
         verbose_name = 'Категория'
@@ -129,9 +148,17 @@ class Categories(models.Model):
 
 
 class Genres(models.Model):
+    """Genres. Include 'name' and 'slug'"""
+
     name = models.CharField(
-        max_length=50, verbose_name='Название жанра', unique=True)
-    slug = models.SlugField(max_length=40, unique=True)
+        max_length=50,
+        verbose_name='Название жанра',
+        unique=True
+    )
+    slug = models.SlugField(
+        max_length=40,
+        unique=True
+    )
 
     class Meta:
         verbose_name = 'Жанр'
@@ -143,16 +170,40 @@ class Genres(models.Model):
 
 
 class Titles(models.Model):
-    name = models.CharField(max_length=80, verbose_name='Название')
-    year = models.IntegerField(verbose_name='Год выпуска')
-    description = models.CharField(
-        max_length=150, verbose_name='Описание', blank=True, null=True)
-    genre = models.ManyToManyField(Genres, related_name='titles')
-    category = models.ForeignKey(Categories,
-                                 on_delete=models.SET_NULL,
-                                 null=True,
-                                 blank=True,
-                                 related_name='titles')
+    """
+    Titles model. Include 'name', 'year',
+    'description', 'genre' and 'category'
+    """
+
+    name = models.CharField(
+        max_length=80,
+        verbose_name='Название'
+    )
+    year = models.PositiveSmallIntegerField(
+        verbose_name='Год выпуска',
+        validators=[
+            MaxValueValidator(
+                datetime.now().year,
+                message='Год больше текущего.'
+            )
+        ],
+        db_index=True
+    )
+    description = models.TextField(
+        verbose_name='Описание',
+        blank=True,
+    )
+    genre = models.ManyToManyField(
+        Genres,
+        related_name='titles'
+    )
+    category = models.ForeignKey(
+        Categories,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='titles'
+    )
 
     class Meta:
         verbose_name = 'Произведение'
@@ -164,17 +215,18 @@ class Titles(models.Model):
 
 
 class Reviews(models.Model):
-    text = models.TextField('Текст')
+    message_score = 'Оценка может быть от 1 до 10.'
+    text = models.TextField(verbose_name='Текст')
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Автор'
     )
-    score = models.IntegerField(
+    score = models.PositiveSmallIntegerField(
         validators=[
-            MinValueValidator(1),
-            MaxValueValidator(10)
+            MinValueValidator(1, message=message_score),
+            MaxValueValidator(10, message=message_score)
         ],
         verbose_name='Оценка'
     )

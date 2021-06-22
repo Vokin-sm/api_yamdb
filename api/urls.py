@@ -1,11 +1,9 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from api.views import LoginView
-from api.views import (TitlesViewSet, CategoriesViewSet,
-                       GenresViewSet, ReviewsViewSet,
-                       CommentsViewSet, UsersViewSet,
-                       UsersMeAPIView, send_confirmation_code_create_user)
+from api.views import (CategoriesViewSet, CommentsViewSet, GenresViewSet,
+                       LoginView, ReviewsViewSet, TitlesViewSet, UsersViewSet,
+                       send_confirmation_code_create_user)
 
 router_v1 = DefaultRouter()
 router_v1.register(
@@ -40,11 +38,6 @@ router_v1.register(
 )
 
 urlpatterns = [
-    path(
-        'v1/users/me/',
-        UsersMeAPIView.as_view(),
-        name='users_me'
-    ),
     path(
         'v1/',
         include(router_v1.urls)
