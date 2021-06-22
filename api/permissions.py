@@ -18,10 +18,11 @@ class IsAdminOrReadOnly(permissions.BasePermission):
 
 
 class IsOwnerOrAdminOrModeratorOrReadOnly(permissions.BasePermission):
+    """Permission to only allow all staff or owner edit it or read only"""
     def has_object_permission(self, request, view, obj):
         return (request.method in permissions.SAFE_METHODS
                 or obj.author == request.user
                 or request.user.is_staff
-                or request.user.role == 'admin'
-                or request.user.role == 'moderator'
+                or request.user.is_admin
+                or request.user.is_moderator
                 )

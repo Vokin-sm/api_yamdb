@@ -1,13 +1,10 @@
-from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
-from django.contrib.auth.models import BaseUserManager
-from django.contrib.auth.models import PermissionsMixin
-from django.core.validators import MaxValueValidator
-from django.core.validators import MinValueValidator
-
 import textwrap
-
 from datetime import datetime
+
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
+                                        PermissionsMixin)
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
 
 class UserManager(BaseUserManager):
@@ -182,11 +179,13 @@ class Titles(models.Model):
         max_length=80,
         verbose_name='Название'
     )
-    year = models.SmallIntegerField(
+    year = models.PositiveSmallIntegerField(
         verbose_name='Год выпуска',
         validators=[
-            MinValueValidator(1),
-            MaxValueValidator(datetime.now().year)
+            MaxValueValidator(
+                datetime.now().year,
+                message='Год больше текущего.'
+            )
         ],
         db_index=True
     )
@@ -216,17 +215,18 @@ class Titles(models.Model):
 
 
 class Reviews(models.Model):
-    text = models.TextField('Текст')
+    message_score = 'Оценка может быть от 1 до 10.'
+    text = models.TextField(verbose_name='Текст')
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Автор'
     )
-    score = models.IntegerField(
+    score = models.PositiveSmallIntegerField(
         validators=[
-            MinValueValidator(1),
-            MaxValueValidator(10)
+            MinValueValidator(1, message=message_score),
+            MaxValueValidator(10, message=message_score)
         ],
         verbose_name='Оценка'
     )
