@@ -8,11 +8,13 @@ class IsAdmin(permissions.IsAdminUser):
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
+    """Object-level permission to only allow admins to edit it or read only."""
+
     def has_permission(self, request, view):
-        return (request.method in permissions.SAFE_METHODS
-                or request.user.is_authenticated
-                and bool(request.user.is_staff or request.user.role == 'admin')
-                )
+        return (
+            request.method in permissions.SAFE_METHODS
+            or request.user.is_admin
+        )
 
 
 class IsOwnerOrAdminOrModeratorOrReadOnly(permissions.BasePermission):

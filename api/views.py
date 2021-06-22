@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework import filters
 from rest_framework.decorators import api_view, action
 from rest_framework.decorators import permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.mixins import CreateModelMixin
@@ -46,8 +46,10 @@ from api.filters import TitlesFilter
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
+    """Class Titles"""
+
     queryset = Titles.objects.all()
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAdminOrReadOnly]
     filterset_class = TitlesFilter
 
     def get_serializer_class(self):
@@ -60,24 +62,30 @@ class LCDViewSet(ListModelMixin,
                  CreateModelMixin,
                  DestroyModelMixin,
                  GenericViewSet):
+    """This class can 'List', 'Create', 'Destroy' objects"""
+
     pass
 
 
 class CategoriesViewSet(LCDViewSet):
+    """Class Categories"""
+
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
     pagination_class = PageNumberPagination
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
 
 
 class GenresViewSet(LCDViewSet):
+    """Class Genres"""
+
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
     pagination_class = PageNumberPagination
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'

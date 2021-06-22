@@ -14,31 +14,41 @@ from django.db.models import Avg
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
+    """Categories serializer"""
+
     class Meta:
-        fields = (
-            'name',
-            'slug'
-        )
         model = Categories
+        exclude = ['id']
 
 
 class GenresSerializer(serializers.ModelSerializer):
+    """Genres serializer"""
+
     class Meta:
-        fields = (
-            'name',
-            'slug'
-        )
         model = Genres
+        exclude = ['id']
 
 
 class TitlesSerializerGet(serializers.ModelSerializer):
-    genre = GenresSerializer(many=True, read_only=True)
+    """Titles serializer for GET requests"""
+
+    genre = GenresSerializer(
+        many=True,
+        read_only=True
+    )
     category = CategoriesSerializer(read_only=True)
     rating = serializers.SerializerMethodField()
 
     class Meta:
-        fields = ('id', 'name', 'year', 'rating',
-                  'description', 'genre', 'category')
+        fields = [
+            'id',
+            'name',
+            'year',
+            'rating',
+            'description',
+            'genre',
+            'category'
+        ]
         model = Titles
 
     def get_rating(self, obj):
@@ -47,16 +57,20 @@ class TitlesSerializerGet(serializers.ModelSerializer):
 
 
 class TitlesSerializerPost(serializers.ModelSerializer):
+    """Titles serializer for POST requests"""
+
     genre = serializers.SlugRelatedField(
         queryset=Genres.objects.all(),
-        slug_field='slug', many=True)
+        slug_field='slug',
+        many=True
+    )
     category = serializers.SlugRelatedField(
         queryset=Categories.objects.all(),
         slug_field='slug'
     )
 
     class Meta:
-        fields = ('__all__')
+        fields = '__all__'
         model = Titles
 
 
