@@ -226,8 +226,8 @@ class Reviews(models.Model):
     )
     score = models.PositiveSmallIntegerField(
         validators=[
-            MinValueValidator(1, message=message_score),
-            MaxValueValidator(10, message=message_score)
+            MinValueValidator(1, message=MESSAGE_SCORE),
+            MaxValueValidator(10, message=MESSAGE_SCORE)
         ],
         verbose_name='Оценка'
     )
