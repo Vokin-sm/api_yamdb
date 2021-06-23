@@ -1,4 +1,4 @@
-import random
+import uuid
 
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
@@ -142,7 +142,7 @@ class UsersViewSet(viewsets.ModelViewSet):
 @permission_classes([AllowAny])
 def send_confirmation_code_create_user(request):
     """Creates a user and sends him a confirmation code by email."""
-    confirmation_code = random.randint(111111, 999999)
+    confirmation_code = str(uuid.uuid4())
     serializer = EmailSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     username = request.data['email'].split('@')[0]
