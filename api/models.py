@@ -216,7 +216,7 @@ class Titles(models.Model):
 
 
 class Reviews(models.Model):
-    message_score = 'Оценка может быть от 1 до 10.'
+    MESSAGE_SCORE = 'Оценка может быть от 1 до 10.'
     text = models.TextField(verbose_name='Текст')
     author = models.ForeignKey(
         User,
