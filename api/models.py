@@ -5,6 +5,14 @@ from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin)
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.core.exceptions import ValidationError
+
+
+def validate_year(value):
+    if value > datetime.now().year:
+        raise ValidationError(
+            'Введенный год больше текущего'
+        )
 
 
 class UserManager(BaseUserManager):
@@ -181,12 +189,7 @@ class Titles(models.Model):
     )
     year = models.PositiveSmallIntegerField(
         verbose_name='Год выпуска',
-        validators=[
-            MaxValueValidator(
-                datetime.now().year,
-                message='Год больше текущего.'
-            )
-        ],
+        validators=[validate_year],
         db_index=True
     )
     description = models.TextField(
