@@ -180,7 +180,7 @@ class UsersMeSerializer(serializers.ModelSerializer):
 class LoginSerializer(TokenObtainPairSerializer):
     """Is used to serialize confirmation code for JWT Token."""
     email = serializers.EmailField()
-    confirmation_code = serializers.IntegerField()
+    confirmation_code = serializers.CharField()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

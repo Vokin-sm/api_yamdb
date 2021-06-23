@@ -14,7 +14,7 @@ class UserManager(BaseUserManager):
                      email,
                      username,
                      password,
-                     confirmation_code=None,
+                     confirmation_code='',
                      **extra_fields):
         if not email:
             raise ValueError('Вы не ввели email')
@@ -43,7 +43,10 @@ class UserManager(BaseUserManager):
             is_active=False
         )
 
-    def create_superuser(self, email, username, password):
+    def create_superuser(self,
+                         email,
+                         username,
+                         password):
         return self._create_user(
             email,
             username,
@@ -90,15 +93,18 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text='Напишите кратко о себе',
         blank=True,
     )
-    email = models.EmailField(max_length=100, unique=True)
+    email = models.EmailField(
+        max_length=100,
+        unique=True
+    )
     role = models.CharField(
         max_length=50,
         choices=RoleChoices.choices,
         default=RoleChoices.USER,
     )
-    confirmation_code = models.IntegerField(
+    confirmation_code = models.CharField(
+        max_length=100,
         blank=True,
-        null=True,
     )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
